@@ -19976,7 +19976,7 @@ function getLocalInstallerPath(inputs, options) {
                 return provider.installerPath(inputs, options);
             }
         }
-        throw Error(`No installer could be found for the given inputs, tried: ${Array.from(providers.map((p) => `\n- ${p.label}`)).join("")}`);
+        throw Error(`No installer could be found for the given inputs`);
     });
 }
 exports.getLocalInstallerPath = getLocalInstallerPath;
@@ -25881,9 +25881,7 @@ function downloadMiniconda(inputs) {
 exports.minicondaDownloader = {
     label: "download Miniconda",
     provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
-        return (inputs.minicondaVersion !== "" &&
-            inputs.architecture !== "x64" &&
-            inputs.installerUrl === "");
+        return inputs.minicondaVersion !== "" && inputs.installerUrl === "";
     }),
     installerPath: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         return {
@@ -34867,16 +34865,14 @@ const providers = [
 function ensureEnvironment(inputs, options) {
     return __awaiter(this, void 0, void 0, function* () {
         for (const provider of providers) {
-            core.info(`Trying ${provider.label}...`);
+            core.info(`Can we use ${provider.label}...`);
             if (yield provider.provides(inputs, options)) {
-                core.info(`... will create with ${provider.label}`);
+                core.info(`... will ${provider.label}`);
                 const args = yield provider.condaArgs(inputs, options);
                 return yield core.group(`Updating env from ${provider.label}...`, () => conda.condaCommand(args, options));
             }
         }
-        throw Error(`'activate-environment: ${inputs.activateEnvironment}' could not be created with any of ${providers
-            .map((x) => `- ${x.label}`)
-            .join("")}`);
+        throw Error(`'activate-environment: ${inputs.activateEnvironment}' could not be created`);
     });
 }
 exports.ensureEnvironment = ensureEnvironment;

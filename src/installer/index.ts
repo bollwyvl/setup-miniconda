@@ -30,11 +30,7 @@ export async function getLocalInstallerPath(
       return provider.installerPath(inputs, options);
     }
   }
-  throw Error(
-    `No installer could be found for the given inputs, tried: ${Array.from(
-      providers.map((p) => `\n- ${p.label}`)
-    ).join("")}`
-  );
+  throw Error(`No installer could be found for the given inputs`);
 }
 
 /**

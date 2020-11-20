@@ -26,9 +26,9 @@ export async function ensureEnvironment(
   options: types.IDynamicOptions
 ): Promise<void> {
   for (const provider of providers) {
-    core.info(`Trying ${provider.label}...`);
+    core.info(`Can we use ${provider.label}...`);
     if (await provider.provides(inputs, options)) {
-      core.info(`... will create with ${provider.label}`);
+      core.info(`... will ${provider.label}`);
       const args = await provider.condaArgs(inputs, options);
       return await core.group(`Updating env from ${provider.label}...`, () =>
         conda.condaCommand(args, options)
@@ -37,11 +37,7 @@ export async function ensureEnvironment(
   }
 
   throw Error(
-    `'activate-environment: ${
-      inputs.activateEnvironment
-    }' could not be created with any of ${providers
-      .map((x) => `- ${x.label}`)
-      .join("")}`
+    `'activate-environment: ${inputs.activateEnvironment}' could not be created`
   );
 }
 
