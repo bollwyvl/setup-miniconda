@@ -32,7 +32,7 @@ export async function installBaseTools(
   let postInstallOptions = { ...options };
   let postInstallActions = [];
   for (const provider of providers) {
-    if (!provider.provides(inputs, options)) {
+    if (!(await provider.provides(inputs, options))) {
       continue;
     }
     core.info(provider.label);

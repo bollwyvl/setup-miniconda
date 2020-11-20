@@ -2071,7 +2071,7 @@ function installBaseTools(inputs, options) {
         let postInstallOptions = Object.assign({}, options);
         let postInstallActions = [];
         for (const provider of providers) {
-            if (!provider.provides(inputs, options)) {
+            if (!(yield provider.provides(inputs, options))) {
                 continue;
             }
             core.info(provider.label);

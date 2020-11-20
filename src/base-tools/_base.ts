@@ -15,7 +15,7 @@ export async function getToolUpdates(
     options,
   };
   for (const [key, provider] of providers.entries()) {
-    if (provider.provides(inputs, options)) {
+    if (!(await provider.provides(inputs, options))) {
       core.info(key);
       const toolUpdates = await provider.toolPackages(inputs, options);
       updates = {
