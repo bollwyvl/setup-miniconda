@@ -32,15 +32,14 @@ export async function installBaseTools(
   let postInstallOptions = { ...options };
   let postInstallActions = [];
   for (const provider of providers) {
-    if (!(await provider.provides(inputs, options))) {
-      continue;
-    }
-    core.info(provider.label);
-    const toolUpdates = await provider.toolPackages(inputs, options);
-    tools.push(...toolUpdates.tools);
-    postInstallOptions = { ...postInstallOptions, ...toolUpdates.options };
-    if (provider.postInstall) {
-      postInstallActions.push(provider.postInstall);
+    if (await provider.provides(inputs, options)) {
+      core.info(provider.label);
+      const toolUpdates = await provider.toolPackages(inputs, options);
+      tools.push(...toolUpdates.tools);
+      postInstallOptions = { ...postInstallOptions, ...toolUpdates.options };
+      if (provider.postInstall) {
+        postInstallActions.push(provider.postInstall);
+      }
     }
   }
 

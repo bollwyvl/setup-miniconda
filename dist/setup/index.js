@@ -2125,15 +2125,14 @@ function installBaseTools(inputs, options) {
         let postInstallOptions = Object.assign({}, options);
         let postInstallActions = [];
         for (const provider of providers) {
-            if (!(yield provider.provides(inputs, options))) {
-                continue;
-            }
-            core.info(provider.label);
-            const toolUpdates = yield provider.toolPackages(inputs, options);
-            tools.push(...toolUpdates.tools);
-            postInstallOptions = Object.assign(Object.assign({}, postInstallOptions), toolUpdates.options);
-            if (provider.postInstall) {
-                postInstallActions.push(provider.postInstall);
+            if (yield provider.provides(inputs, options)) {
+                core.info(provider.label);
+                const toolUpdates = yield provider.toolPackages(inputs, options);
+                tools.push(...toolUpdates.tools);
+                postInstallOptions = Object.assign(Object.assign({}, postInstallOptions), toolUpdates.options);
+                if (provider.postInstall) {
+                    postInstallActions.push(provider.postInstall);
+                }
             }
         }
         if (tools.length) {
@@ -6470,6 +6469,25 @@ module.exports = assignMergeValue;
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -6481,10 +6499,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updatePython = void 0;
-const _utils_1 = __webpack_require__(567);
+const utils = __importStar(__webpack_require__(567));
 exports.updatePython = {
     label: "Update python",
-    provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () { return !!(inputs.pythonVersion && _utils_1.isBaseEnv(inputs.activateEnvironment)); }),
+    provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () { return !!(inputs.pythonVersion && utils.isBaseEnv(inputs.activateEnvironment)); }),
     toolPackages: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         let updates = {
             tools: [],
@@ -13339,8 +13357,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateMamba = void 0;
-const core = __importStar(__webpack_require__(470));
 const fs = __importStar(__webpack_require__(747));
+const core = __importStar(__webpack_require__(470));
 const constants = __importStar(__webpack_require__(58));
 const conda = __importStar(__webpack_require__(259));
 exports.updateMamba = {
@@ -34800,7 +34818,6 @@ function ensureEnvironment(inputs, options) {
                 const args = yield provider.condaArgs(inputs, options);
                 return yield core.group(`Updating env from ${provider.label}...`, () => conda.condaCommand(args, options));
             }
-            break;
         }
         throw Error(`'activate-environment: ${inputs.activateEnvironment}' could not be created with any of ${providers
             .map((x) => `- ${x.label}`)

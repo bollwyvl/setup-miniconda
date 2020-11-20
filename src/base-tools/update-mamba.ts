@@ -1,5 +1,7 @@
-import * as core from "@actions/core";
 import * as fs from "fs";
+
+import * as core from "@actions/core";
+
 import * as types from "../_types";
 import * as constants from "../_constants";
 import * as conda from "../conda";

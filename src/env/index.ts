@@ -34,7 +34,6 @@ export async function ensureEnvironment(
         conda.condaCommand(args, options)
       );
     }
-    break;
   }
 
   throw Error(
