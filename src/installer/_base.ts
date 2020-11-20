@@ -1,14 +1,12 @@
 import * as crypto from "crypto";
 import * as path from "path";
-
-import * as io from "@actions/io";
 import { URL, fileURLToPath } from "url";
 
+import * as io from "@actions/io";
 import * as tc from "@actions/tool-cache";
 import * as core from "@actions/core";
 
 import * as types from "../_types";
-import * as utils from "../_utils";
 
 /** Get the path for a locally-executable installer from cache, or as downloaded
  *
@@ -79,58 +77,4 @@ export async function ensureLocalInstaller(
   }
 
   return executablePath;
-}
-
-/**
- * Install Miniconda
- *
- * @param installerPath must have an appropriate extension for this platform
- */
-export async function runInstaller(
-  installerPath: string,
-  outputPath: string
-): Promise<void> {
-  const installerExtension = path.extname(installerPath);
-  let command: string[];
-
-  switch (installerExtension) {
-    case ".exe":
-      /* From https://docs.anaconda.com/anaconda/install/silent-mode/
-        /D=<installation path> - Destination installation path.
-                                - Must be the last argument.
-                                - Do not wrap in quotation marks.
-                                - Required if you use /S.
-        For the above reasons, this is treated a monolithic arg
-      */
-      command = [
-        `"${installerPath}" /InstallationType=JustMe /RegisterPython=0 /S /D=${outputPath}`,
-      ];
-      break;
-    case ".sh":
-      command = ["bash", installerPath, "-f", "-b", "-p", outputPath];
-      break;
-    default:
-      throw Error(`Unknown installer extension: ${installerExtension}`);
-  }
-
-  await utils.execute(command);
-}
-
-export const providers: Map<string, types.IInstallerProvider> = new Map();
-
-/** see if any provider */
-export async function getLocalInstallerPath(
-  inputs: types.IActionInputs,
-  options: types.IDynamicOptions
-) {
-  for (const [key, provider] of providers.entries()) {
-    if (await provider.provides(inputs, options)) {
-      return await core.group(`Download installer with ${key}...`, () =>
-        provider.installerPath(inputs, options)
-      );
-    }
-  }
-  throw Error(
-    `No provider could be found for the given inputs, tried: ${providers.keys()}`
-  );
 }

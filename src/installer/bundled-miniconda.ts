@@ -1,6 +1,7 @@
-import { providers } from "./_base";
+import * as types from "../_types";
 
-providers.set("Use Bundled Miniconda", {
+export const bundledMinicondaUser: types.IInstallerProvider = {
+  label: "Bundled Miniconda",
   provides: async (inputs, options) => {
     return inputs.minicondaVersion !== "" && inputs.architecture === "x64";
   },
@@ -13,4 +14,4 @@ providers.set("Use Bundled Miniconda", {
       },
     };
   },
-});
+};

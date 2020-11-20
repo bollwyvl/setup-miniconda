@@ -1,5 +1,6 @@
-import getHrefs from "get-hrefs";
 import * as fs from "fs";
+
+import getHrefs from "get-hrefs";
 
 import * as tc from "@actions/tool-cache";
 import * as core from "@actions/core";
@@ -7,7 +8,7 @@ import * as core from "@actions/core";
 import * as types from "../_types";
 import * as constants from "../_constants";
 
-import { ensureLocalInstaller, providers } from "./_base";
+import { ensureLocalInstaller } from "./_base";
 
 /**
  * List available Miniconda versions
@@ -68,7 +69,8 @@ async function downloadMiniconda(inputs: types.IActionInputs) {
   });
 }
 
-providers.set(`Download Miniconda from ${constants.MINICONDA_BASE_URL}`, {
+export const minicondaDownloader: types.IInstallerProvider = {
+  label: "Download Miniconda",
   provides: async (inputs, options) => {
     return inputs.minicondaVersion !== "" && inputs.architecture !== "x64";
   },
@@ -81,4 +83,4 @@ providers.set(`Download Miniconda from ${constants.MINICONDA_BASE_URL}`, {
       },
     };
   },
-});
+};

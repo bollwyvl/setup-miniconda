@@ -2,7 +2,6 @@
  * A subset of the .condarc file options available as action inputs
  * https://docs.conda.io/projects/conda/en/latest/user-guide/configuration/use-condarc.html
  */
-
 export interface ICondaConfig {
   add_anaconda_token: string;
   add_pip_as_python_dependency: string;
@@ -112,6 +111,7 @@ export interface IInstallerResult {
  * A strategy for ensuring a locally-runnable provider (or no-op, if bundled)
  */
 export interface IInstallerProvider {
+  label: string;
   provides: (
     inputs: IActionInputs,
     options: IDynamicOptions

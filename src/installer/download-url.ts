@@ -1,6 +1,10 @@
-import { ensureLocalInstaller, providers } from "./_base";
+import * as types from "../_types";
 
-providers.set("Download Installer from Custom URL", {
+import { ensureLocalInstaller } from "./_base";
+
+
+export const urlDownloader: types.IInstallerProvider = {
+  label: "Download URL",
   provides: async (inputs, options) => {
     return inputs.minicondaVersion !== "" && inputs.architecture !== "x64";
   },
@@ -15,4 +19,4 @@ providers.set("Download Installer from Custom URL", {
       },
     };
   },
-});
+};
