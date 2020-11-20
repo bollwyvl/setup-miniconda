@@ -1114,7 +1114,36 @@ module.exports = setCacheAdd;
 
 
 /***/ }),
-/* 21 */,
+/* 21 */
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ensureSimple = void 0;
+exports.ensureSimple = {
+    label: "Simple Environment",
+    provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () { var _a, _b, _c; return !(((_b = (_a = options.envSpec) === null || _a === void 0 ? void 0 : _a.explicit) === null || _b === void 0 ? void 0 : _b.length) || ((_c = options.envSpec) === null || _c === void 0 ? void 0 : _c.yaml) == null); }),
+    condaArgs: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
+        const args = ["create", "--name", inputs.activateEnvironment];
+        if (inputs.pythonVersion) {
+            args.push(`python ${inputs.pythonVersion}`);
+        }
+        return args;
+    }),
+};
+
+
+/***/ }),
 /* 22 */
 /***/ (function(module) {
 
@@ -18368,7 +18397,112 @@ exports.default = run;
 
 /***/ }),
 /* 527 */,
-/* 528 */,
+/* 528 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ensureYaml = void 0;
+const fs = __importStar(__webpack_require__(747));
+const os = __importStar(__webpack_require__(87));
+const path = __importStar(__webpack_require__(622));
+const yaml = __importStar(__webpack_require__(414));
+const core = __importStar(__webpack_require__(470));
+const constants = __importStar(__webpack_require__(58));
+const providers = [
+    {
+        label: "python",
+        provides: (inputs) => !!inputs.pythonVersion,
+        specMatch: constants.PYTHON_SPEC,
+        spec: ({ pythonVersion }) => `python ${pythonVersion}`,
+    },
+];
+exports.ensureYaml = {
+    label: "YAML",
+    provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () { var _a; return !!((_a = options.envSpec) === null || _a === void 0 ? void 0 : _a.yaml); }),
+    condaArgs: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
+        var _b;
+        const yamlData = (_b = options.envSpec) === null || _b === void 0 ? void 0 : _b.yaml;
+        if (yamlData == null) {
+            throw Error(`'environment-file: ${inputs.environmentFile}' appears to be malformed`);
+        }
+        let envFile = inputs.environmentFile;
+        let patchesApplied = [];
+        // make a copy, update with each patch
+        let dependencies = [
+            ...(yamlData.dependencies || []),
+        ];
+        for (const provider of providers) {
+            if (!provider.provides(inputs, options)) {
+                continue;
+            }
+            const newSpec = provider.spec(inputs, options);
+            let didPatch = false;
+            let patchedDeps = [];
+            for (const spec of dependencies || []) {
+                // ignore pip
+                if (!(spec instanceof String) || !spec.match(constants.PYTHON_SPEC)) {
+                    patchedDeps.push(spec);
+                    continue;
+                }
+                patchedDeps.push(newSpec);
+                didPatch = true;
+            }
+            // if there was nothing to patch, just append
+            if (!didPatch) {
+                patchedDeps.push(newSpec);
+            }
+            patchesApplied.push(newSpec);
+            dependencies = patchedDeps;
+        }
+        if (patchesApplied.length) {
+            const patchedYaml = yaml.safeDump(Object.assign(Object.assign({}, yamlData), { dependencies }));
+            envFile = path.join(os.tmpdir(), "environment-patched.yml");
+            core.info(`Making copy of 'environment-file: ${inputs.environmentFile}'\n${patchedYaml}`);
+            fs.writeFileSync(envFile, patchedYaml, "utf8");
+        }
+        return [
+            "env",
+            "update",
+            "--name",
+            inputs.activateEnvironment,
+            "--file",
+            envFile,
+        ];
+    }),
+};
+
+
+/***/ }),
 /* 529 */,
 /* 530 */,
 /* 531 */,
@@ -34624,7 +34758,13 @@ const yaml = __importStar(__webpack_require__(414));
 const core = __importStar(__webpack_require__(470));
 const conda = __importStar(__webpack_require__(259));
 const explicit_1 = __webpack_require__(285);
-const providers = [explicit_1.ensureExplicit];
+const yaml_1 = __webpack_require__(528);
+const simple_1 = __webpack_require__(21);
+const providers = [
+    explicit_1.ensureExplicit,
+    yaml_1.ensureYaml,
+    simple_1.ensureSimple,
+];
 /**
  * Create test environment, or update the base environment
  */
@@ -34633,9 +34773,7 @@ function ensureEnvironment(inputs, options) {
         for (const provider of providers) {
             if (yield provider.provides(inputs, options)) {
                 const args = yield provider.condaArgs(inputs, options);
-                return yield core.group(`Updating env from ${provider.label}...`, () => 
-                // TODO: not sure why we need to cast, here...
-                conda.condaCommand(args, options));
+                return yield core.group(`Updating env from ${provider.label}...`, () => conda.condaCommand(args, options));
             }
             break;
         }

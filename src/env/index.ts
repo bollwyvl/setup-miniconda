@@ -9,8 +9,14 @@ import * as types from "../_types";
 import * as conda from "../conda";
 
 import { ensureExplicit } from "./explicit";
+import { ensureYaml } from "./yaml";
+import { ensureSimple } from "./simple";
 
-const providers: types.IEnvProvider[] = [ensureExplicit];
+const providers: types.IEnvProvider[] = [
+  ensureExplicit,
+  ensureYaml,
+  ensureSimple,
+];
 
 /**
  * Create test environment, or update the base environment
@@ -23,7 +29,6 @@ export async function ensureEnvironment(
     if (await provider.provides(inputs, options)) {
       const args = await provider.condaArgs(inputs, options);
       return await core.group(`Updating env from ${provider.label}...`, () =>
-        // TODO: not sure why we need to cast, here...
         conda.condaCommand(args, options)
       );
     }
