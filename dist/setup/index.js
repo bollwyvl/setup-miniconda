@@ -16865,7 +16865,7 @@ exports.bundledMinicondaUser = void 0;
 exports.bundledMinicondaUser = {
     label: "Bundled Miniconda",
     provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
-        return inputs.minicondaVersion !== "" && inputs.architecture === "x64";
+        return inputs.minicondaVersion === "" && inputs.architecture === "x64";
     }),
     installerPath: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         return {
