@@ -1155,7 +1155,8 @@ exports.ensureSimple = {
     provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         var _a, _b, _c;
         core.info(JSON.stringify(options));
-        return !(((_b = (_a = options.envSpec) === null || _a === void 0 ? void 0 : _a.explicit) === null || _b === void 0 ? void 0 : _b.length) || ((_c = options.envSpec) === null || _c === void 0 ? void 0 : _c.yaml) == null);
+        return !(((_b = (_a = options.envSpec) === null || _a === void 0 ? void 0 : _a.explicit) === null || _b === void 0 ? void 0 : _b.length) ||
+            Object.keys(((_c = options.envSpec) === null || _c === void 0 ? void 0 : _c.yaml) || {}).length);
     }),
     condaArgs: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         const args = ["create", "--name", inputs.activateEnvironment];
@@ -13223,7 +13224,7 @@ const RULES = [
  */
 function parseInputs() {
     return __awaiter(this, void 0, void 0, function* () {
-        const inputs = {
+        const inputs = Object.freeze({
             activateEnvironment: core.getInput("activate-environment"),
             architecture: core.getInput("architecture"),
             condaBuildVersion: core.getInput("conda-build-version"),
@@ -13235,7 +13236,7 @@ function parseInputs() {
             minicondaVersion: core.getInput("miniconda-version"),
             pythonVersion: core.getInput("python-version"),
             removeProfiles: core.getInput("remove-profiles"),
-            condaConfig: {
+            condaConfig: Object.freeze({
                 add_anaconda_token: core.getInput("add-anaconda-token"),
                 add_pip_as_python_dependency: core.getInput("add-pip-as-python-dependency"),
                 allow_softlinks: core.getInput("allow-softlinks"),
@@ -13249,8 +13250,8 @@ function parseInputs() {
                 // these are always set to avoid terminal issues
                 always_yes: "true",
                 changeps1: "false",
-            },
-        };
+            }),
+        });
         const errors = RULES.reduce((errors, rule) => {
             const msg = rule(inputs, inputs.condaConfig);
             if (msg) {
@@ -13259,12 +13260,10 @@ function parseInputs() {
             }
             return errors;
         }, []);
-        // TODO: remove
-        core.info(JSON.stringify(inputs));
         if (errors.length) {
             throw Error(`${errors.length} errors found in action inputs`);
         }
-        return inputs;
+        return Object.freeze(inputs);
     });
 }
 exports.parseInputs = parseInputs;
@@ -18472,7 +18471,7 @@ const providers = [
 ];
 exports.ensureYaml = {
     label: "YAML",
-    provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () { var _a; return !!((_a = options.envSpec) === null || _a === void 0 ? void 0 : _a.yaml); }),
+    provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () { var _a; return !!Object.keys(((_a = options.envSpec) === null || _a === void 0 ? void 0 : _a.yaml) || {}).length; }),
     condaArgs: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         var _b;
         const yamlData = (_b = options.envSpec) === null || _b === void 0 ? void 0 : _b.yaml;
@@ -34795,7 +34794,6 @@ const providers = [
 function ensureEnvironment(inputs, options) {
     return __awaiter(this, void 0, void 0, function* () {
         for (const provider of providers) {
-            core.info(JSON.stringify({ inputs, options }));
             if (yield provider.provides(inputs, options)) {
                 const args = yield provider.condaArgs(inputs, options);
                 return yield core.group(`Updating env from ${provider.label}...`, () => conda.condaCommand(args, options));

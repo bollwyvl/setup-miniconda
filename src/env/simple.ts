@@ -7,7 +7,8 @@ export const ensureSimple: types.IEnvProvider = {
   provides: async (inputs, options) => {
     core.info(JSON.stringify(options));
     return !(
-      options.envSpec?.explicit?.length || options.envSpec?.yaml == null
+      options.envSpec?.explicit?.length ||
+      Object.keys(options.envSpec?.yaml || {}).length
     );
   },
   condaArgs: async (inputs, options) => {

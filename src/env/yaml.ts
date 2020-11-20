@@ -27,10 +27,10 @@ const providers: IEnvPatchProvider[] = [
     spec: ({ pythonVersion }) => `python ${pythonVersion}`,
   },
 ];
-
 export const ensureYaml: types.IEnvProvider = {
   label: "YAML",
-  provides: async (inputs, options) => !!options.envSpec?.yaml,
+  provides: async (inputs, options) =>
+    !!Object.keys(options.envSpec?.yaml || {}).length,
   condaArgs: async (inputs, options) => {
     const yamlData = options.envSpec?.yaml;
     if (yamlData == null) {

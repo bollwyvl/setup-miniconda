@@ -26,7 +26,6 @@ export async function ensureEnvironment(
   options: types.IDynamicOptions
 ): Promise<void> {
   for (const provider of providers) {
-    core.info(JSON.stringify({ inputs, options }));
     if (await provider.provides(inputs, options)) {
       const args = await provider.condaArgs(inputs, options);
       return await core.group(`Updating env from ${provider.label}...`, () =>

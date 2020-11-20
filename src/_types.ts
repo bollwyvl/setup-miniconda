@@ -21,18 +21,18 @@ export interface ICondaConfig {
  * The action inputs, as defined in `action.yml`
  */
 export interface IActionInputs {
-  activateEnvironment: string;
-  architecture: string;
-  condaBuildVersion: string;
-  condaConfig: ICondaConfig;
-  condaConfigFile: string;
-  condaVersion: string;
-  environmentFile: string;
-  installerUrl: string;
-  mambaVersion: string;
-  minicondaVersion: string;
-  pythonVersion: string;
-  removeProfiles: string;
+  readonly activateEnvironment: string;
+  readonly architecture: string;
+  readonly condaBuildVersion: string;
+  readonly condaConfig: Readonly<ICondaConfig>;
+  readonly condaConfigFile: string;
+  readonly condaVersion: string;
+  readonly environmentFile: string;
+  readonly installerUrl: string;
+  readonly mambaVersion: string;
+  readonly minicondaVersion: string;
+  readonly pythonVersion: string;
+  readonly removeProfiles: string;
 }
 
 interface ISucceedResult {

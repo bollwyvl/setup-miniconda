@@ -47,7 +47,7 @@ const RULES: IRule[] = [
  * Parse, validate, and normalize string-ish inputs from `with`
  */
 export async function parseInputs(): Promise<types.IActionInputs> {
-  const inputs: types.IActionInputs = {
+  const inputs = Object.freeze({
     activateEnvironment: core.getInput("activate-environment"),
     architecture: core.getInput("architecture"),
     condaBuildVersion: core.getInput("conda-build-version"),
@@ -59,7 +59,7 @@ export async function parseInputs(): Promise<types.IActionInputs> {
     minicondaVersion: core.getInput("miniconda-version"),
     pythonVersion: core.getInput("python-version"),
     removeProfiles: core.getInput("remove-profiles"),
-    condaConfig: {
+    condaConfig: Object.freeze({
       add_anaconda_token: core.getInput("add-anaconda-token"),
       add_pip_as_python_dependency: core.getInput(
         "add-pip-as-python-dependency"
@@ -75,8 +75,8 @@ export async function parseInputs(): Promise<types.IActionInputs> {
       // these are always set to avoid terminal issues
       always_yes: "true",
       changeps1: "false",
-    },
-  };
+    }),
+  });
 
   const errors = RULES.reduce((errors, rule) => {
     const msg = rule(inputs, inputs.condaConfig);
@@ -87,12 +87,9 @@ export async function parseInputs(): Promise<types.IActionInputs> {
     return errors;
   }, [] as string[]);
 
-  // TODO: remove
-  core.info(JSON.stringify(inputs));
-
   if (errors.length) {
     throw Error(`${errors.length} errors found in action inputs`);
   }
 
-  return inputs;
+  return Object.freeze(inputs);
 }
