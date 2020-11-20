@@ -1115,10 +1115,29 @@ module.exports = setCacheAdd;
 
 /***/ }),
 /* 21 */
-/***/ (function(__unusedmodule, exports) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -1130,9 +1149,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ensureSimple = void 0;
+const core = __importStar(__webpack_require__(470));
 exports.ensureSimple = {
     label: "Simple Environment",
-    provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () { var _a, _b, _c; return !(((_b = (_a = options.envSpec) === null || _a === void 0 ? void 0 : _a.explicit) === null || _b === void 0 ? void 0 : _b.length) || ((_c = options.envSpec) === null || _c === void 0 ? void 0 : _c.yaml) == null); }),
+    provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a, _b, _c;
+        core.info(JSON.stringify(options));
+        return !(((_b = (_a = options.envSpec) === null || _a === void 0 ? void 0 : _a.explicit) === null || _b === void 0 ? void 0 : _b.length) || ((_c = options.envSpec) === null || _c === void 0 ? void 0 : _c.yaml) == null);
+    }),
     condaArgs: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         const args = ["create", "--name", inputs.activateEnvironment];
         if (inputs.pythonVersion) {
@@ -34771,6 +34795,7 @@ const providers = [
 function ensureEnvironment(inputs, options) {
     return __awaiter(this, void 0, void 0, function* () {
         for (const provider of providers) {
+            core.info(JSON.stringify({ inputs, options }));
             if (yield provider.provides(inputs, options)) {
                 const args = yield provider.condaArgs(inputs, options);
                 return yield core.group(`Updating env from ${provider.label}...`, () => conda.condaCommand(args, options));
