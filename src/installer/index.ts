@@ -14,8 +14,8 @@ import { bundledMinicondaUser } from "./bundled-miniconda";
  */
 const providers: types.IInstallerProvider[] = [
   bundledMinicondaUser,
-  minicondaDownloader,
   urlDownloader,
+  minicondaDownloader,
 ];
 
 /** see if any provider */
@@ -24,11 +24,10 @@ export async function getLocalInstallerPath(
   options: types.IDynamicOptions
 ) {
   for (const provider of providers) {
+    core.info(`Can we ${provider.label}?`);
     if (await provider.provides(inputs, options)) {
-      return await core.group(
-        `Download installer with ${provider.label}...`,
-        () => provider.installerPath(inputs, options)
-      );
+      core.info(`... will ${provider.label}`);
+      return provider.installerPath(inputs, options);
     }
   }
   throw Error(

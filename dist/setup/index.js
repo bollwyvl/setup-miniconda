@@ -15288,10 +15288,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.urlDownloader = void 0;
 const _base_1 = __webpack_require__(895);
 exports.urlDownloader = {
-    label: "Download URL",
-    provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
-        return inputs.minicondaVersion !== "" && inputs.architecture !== "x64";
-    }),
+    label: "download a custom installer by URL",
+    provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () { return !!inputs.installerUrl; }),
     installerPath: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         return {
             localInstallerPath: yield _base_1.ensureLocalInstaller({
@@ -16940,7 +16938,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.bundledMinicondaUser = void 0;
 exports.bundledMinicondaUser = {
-    label: "Bundled Miniconda",
+    label: "use bundled Miniconda",
     provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         return (inputs.minicondaVersion === "" &&
             inputs.architecture === "x64" &&
@@ -19942,15 +19940,17 @@ const bundled_miniconda_1 = __webpack_require__(468);
  */
 const providers = [
     bundled_miniconda_1.bundledMinicondaUser,
-    download_miniconda_1.minicondaDownloader,
     download_url_1.urlDownloader,
+    download_miniconda_1.minicondaDownloader,
 ];
 /** see if any provider */
 function getLocalInstallerPath(inputs, options) {
     return __awaiter(this, void 0, void 0, function* () {
         for (const provider of providers) {
+            core.info(`Can we ${provider.label}?`);
             if (yield provider.provides(inputs, options)) {
-                return yield core.group(`Download installer with ${provider.label}...`, () => provider.installerPath(inputs, options));
+                core.info(`... will ${provider.label}`);
+                return provider.installerPath(inputs, options);
             }
         }
         throw Error(`No installer could be found for the given inputs, tried: ${Array.from(providers.map((p) => `\n- ${p.label}`)).join("")}`);
@@ -25824,7 +25824,7 @@ function downloadMiniconda(inputs) {
     });
 }
 exports.minicondaDownloader = {
-    label: "Download Miniconda",
+    label: "download Miniconda",
     provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         return (inputs.minicondaVersion !== "" &&
             inputs.architecture !== "x64" &&

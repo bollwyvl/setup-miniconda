@@ -1,7 +1,7 @@
 import * as types from "../_types";
 
 export const bundledMinicondaUser: types.IInstallerProvider = {
-  label: "Bundled Miniconda",
+  label: "use bundled Miniconda",
   provides: async (inputs, options) => {
     return (
       inputs.minicondaVersion === "" &&
