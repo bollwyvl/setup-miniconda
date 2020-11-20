@@ -2083,7 +2083,7 @@ function installBaseTools(inputs, options) {
             }
         }
         if (tools.length) {
-            yield conda.condaCommand(["update", "--name", "base", ...tools], 
+            yield conda.condaCommand(["install", "--name", "base", ...tools], 
             // use the original `options`, as we can't guarantee `mamba` is available
             // TODO: allow declaring that the installer already has `mamba`
             options);

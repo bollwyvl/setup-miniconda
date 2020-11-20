@@ -46,7 +46,7 @@ export async function installBaseTools(
 
   if (tools.length) {
     await conda.condaCommand(
-      ["update", "--name", "base", ...tools],
+      ["install", "--name", "base", ...tools],
       // use the original `options`, as we can't guarantee `mamba` is available
       // TODO: allow declaring that the installer already has `mamba`
       options
