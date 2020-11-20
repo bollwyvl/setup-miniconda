@@ -12823,13 +12823,14 @@ function applyCondaConfiguration(inputs, options) {
     return __awaiter(this, void 0, void 0, function* () {
         const configEntries = Object.entries(inputs.condaConfig);
         // channels are special: if specified as an action input, these take priority
-        let channels = inputs.condaConfig.channels.split(/[,\n]/);
+        let channels = inputs.condaConfig.channels.trim().split(/[,\n]/);
         if (!channels.length && ((_c = (_b = (_a = options.envSpec) === null || _a === void 0 ? void 0 : _a.yaml) === null || _b === void 0 ? void 0 : _b.channels) === null || _c === void 0 ? void 0 : _c.length)) {
             channels = options.envSpec.yaml.channels;
         }
         // LIFO: reverse order to preserve higher priority as listed in the option
         for (const channel of channels.reverse()) {
-            yield condaCommand(["config", "--add", "channels", channel], options);
+            core.info(`Adding channel '${channel}'`);
+            yield condaCommand(["config", "--add", "channels", channel.trim()], options);
         }
         // all other options
         for (const [key, value] of configEntries) {

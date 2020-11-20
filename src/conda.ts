@@ -224,7 +224,7 @@ export async function applyCondaConfiguration(
   ][];
 
   // channels are special: if specified as an action input, these take priority
-  let channels = inputs.condaConfig.channels.split(/[,\n]/);
+  let channels = inputs.condaConfig.channels.trim().split(/[,\n]/);
 
   if (!channels.length && options.envSpec?.yaml?.channels?.length) {
     channels = options.envSpec.yaml.channels;
@@ -232,7 +232,11 @@ export async function applyCondaConfiguration(
 
   // LIFO: reverse order to preserve higher priority as listed in the option
   for (const channel of channels.reverse()) {
-    await condaCommand(["config", "--add", "channels", channel], options);
+    core.info(`Adding channel '${channel}'`);
+    await condaCommand(
+      ["config", "--add", "channels", channel.trim()],
+      options
+    );
   }
 
   // all other options
