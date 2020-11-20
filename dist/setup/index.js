@@ -25579,8 +25579,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.minicondaDownloader = void 0;
-const get_hrefs_1 = __importDefault(__webpack_require__(222));
 const fs = __importStar(__webpack_require__(747));
+const get_hrefs_1 = __importDefault(__webpack_require__(222));
 const tc = __importStar(__webpack_require__(533));
 const core = __importStar(__webpack_require__(470));
 const constants = __importStar(__webpack_require__(58));
@@ -32870,8 +32870,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ensureLocalInstaller = void 0;
 const crypto = __importStar(__webpack_require__(417));
 const path = __importStar(__webpack_require__(622));
-const io = __importStar(__webpack_require__(1));
 const url_1 = __webpack_require__(835);
+const io = __importStar(__webpack_require__(1));
 const tc = __importStar(__webpack_require__(533));
 const core = __importStar(__webpack_require__(470));
 /** Get the path for a locally-executable installer from cache, or as downloaded

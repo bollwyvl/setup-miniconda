@@ -2,7 +2,6 @@ import * as types from "../_types";
 
 import { ensureLocalInstaller } from "./_base";
 
-
 export const urlDownloader: types.IInstallerProvider = {
   label: "Download URL",
   provides: async (inputs, options) => {
