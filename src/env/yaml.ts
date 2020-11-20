@@ -8,6 +8,7 @@ import * as core from "@actions/core";
 
 import * as types from "../_types";
 import * as constants from "../_constants";
+import * as utils from "../_utils";
 
 interface IEnvPatchProvider {
   label: string;
@@ -24,7 +25,7 @@ const providers: IEnvPatchProvider[] = [
     label: "python",
     provides: (inputs) => !!inputs.pythonVersion,
     specMatch: constants.PYTHON_SPEC,
-    spec: ({ pythonVersion }) => `python ${pythonVersion}`,
+    spec: ({ pythonVersion }) => utils.makeSpec("python", pythonVersion),
   },
 ];
 export const ensureYaml: types.IEnvProvider = {

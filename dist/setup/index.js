@@ -1150,6 +1150,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ensureSimple = void 0;
 const core = __importStar(__webpack_require__(470));
+const utils = __importStar(__webpack_require__(567));
 exports.ensureSimple = {
     label: "create (simple)",
     provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
@@ -1161,7 +1162,7 @@ exports.ensureSimple = {
     condaArgs: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         const args = ["create", "--name", inputs.activateEnvironment];
         if (inputs.pythonVersion) {
-            args.push(`python ${inputs.pythonVersion}`);
+            args.push(utils.makeSpec("python", inputs.pythonVersion));
         }
         return args;
     }),
@@ -6508,7 +6509,7 @@ exports.updatePython = {
             tools: [],
             options,
         };
-        updates.tools.push(`python ${inputs.pythonVersion}`);
+        updates.tools.push(utils.makeSpec("python", inputs.pythonVersion));
         return updates;
     }),
 };
@@ -10952,10 +10953,29 @@ module.exports = {
 /***/ }),
 /* 233 */,
 /* 234 */
-/***/ (function(__unusedmodule, exports) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -10967,12 +10987,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateCondaBuild = void 0;
+const utils = __importStar(__webpack_require__(567));
 exports.updateCondaBuild = {
     label: "Update conda-build",
     provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () { return inputs.condaBuildVersion !== ""; }),
     toolPackages: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         return {
-            tools: [`conda-build ${inputs.condaBuildVersion}`],
+            tools: [utils.makeSpec("conda-build", inputs.condaBuildVersion)],
             options,
         };
     }),
@@ -13360,6 +13381,7 @@ exports.updateMamba = void 0;
 const fs = __importStar(__webpack_require__(747));
 const core = __importStar(__webpack_require__(470));
 const constants = __importStar(__webpack_require__(58));
+const utils = __importStar(__webpack_require__(567));
 const conda = __importStar(__webpack_require__(259));
 exports.updateMamba = {
     label: "Update mamba",
@@ -13367,7 +13389,7 @@ exports.updateMamba = {
     toolPackages: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         core.warning(`Mamba support is still experimental and can result in differently solved environments!`);
         return {
-            tools: [`mamba ${inputs.mambaVersion}`],
+            tools: [utils.makeSpec("mamba", inputs.mambaVersion)],
             options,
         };
     }),
@@ -18477,12 +18499,13 @@ const path = __importStar(__webpack_require__(622));
 const yaml = __importStar(__webpack_require__(414));
 const core = __importStar(__webpack_require__(470));
 const constants = __importStar(__webpack_require__(58));
+const utils = __importStar(__webpack_require__(567));
 const providers = [
     {
         label: "python",
         provides: (inputs) => !!inputs.pythonVersion,
         specMatch: constants.PYTHON_SPEC,
-        spec: ({ pythonVersion }) => `python ${pythonVersion}`,
+        spec: ({ pythonVersion }) => utils.makeSpec("python", pythonVersion),
     },
 ];
 exports.ensureYaml = {
@@ -20228,7 +20251,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.execute = exports.cacheFolder = exports.isBaseEnv = void 0;
+exports.execute = exports.makeSpec = exports.cacheFolder = exports.isBaseEnv = void 0;
 const os = __importStar(__webpack_require__(87));
 const path = __importStar(__webpack_require__(622));
 const constants = __importStar(__webpack_require__(58));
@@ -20248,6 +20271,18 @@ function cacheFolder() {
     return path.join(os.homedir(), constants.CONDA_CACHE_FOLDER);
 }
 exports.cacheFolder = cacheFolder;
+/**
+ * create a spec string. Generally favors '=' unless specified more tightly
+ */
+function makeSpec(pkg, spec) {
+    if (spec.match(/=<>!\|/)) {
+        return `${pkg}${spec}`;
+    }
+    else {
+        return `${pkg}=${spec}`;
+    }
+}
+exports.makeSpec = makeSpec;
 /**
  * Run exec.exec with error handling
  */
@@ -24146,10 +24181,29 @@ module.exports = hashClear;
 /* 713 */,
 /* 714 */,
 /* 715 */
-/***/ (function(__unusedmodule, exports) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -24161,6 +24215,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateConda = void 0;
+const utils = __importStar(__webpack_require__(567));
 exports.updateConda = {
     label: "Update conda",
     provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
@@ -24173,7 +24228,7 @@ exports.updateConda = {
             options,
         };
         if (inputs.condaVersion !== "") {
-            updates.tools.push(`conda ${inputs.condaVersion}`);
+            updates.tools.push(utils.makeSpec("conda", inputs.condaVersion));
         }
         else if (inputs.condaConfig.auto_update_conda === "yes") {
             updates.tools.push(`conda`);

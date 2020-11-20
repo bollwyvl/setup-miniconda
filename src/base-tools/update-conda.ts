@@ -1,4 +1,5 @@
 import * as types from "../_types";
+import * as utils from "../_utils";
 
 export const updateConda: types.IToolProvider = {
   label: "Update conda",
@@ -12,7 +13,7 @@ export const updateConda: types.IToolProvider = {
     };
 
     if (inputs.condaVersion !== "") {
-      updates.tools.push(`conda ${inputs.condaVersion}`);
+      updates.tools.push(utils.makeSpec("conda", inputs.condaVersion));
     } else if (inputs.condaConfig.auto_update_conda === "yes") {
       updates.tools.push(`conda`);
     }

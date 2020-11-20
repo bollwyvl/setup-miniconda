@@ -19,6 +19,17 @@ export function cacheFolder() {
 }
 
 /**
+ * create a spec string. Generally favors '=' unless specified more tightly
+ */
+export function makeSpec(pkg: string, spec: string) {
+  if (spec.match(/=<>!\|/)) {
+    return `${pkg}${spec}`;
+  } else {
+    return `${pkg}=${spec}`;
+  }
+}
+
+/**
  * Run exec.exec with error handling
  */
 export async function execute(command: string[]): Promise<void> {

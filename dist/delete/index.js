@@ -1584,7 +1584,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.execute = exports.cacheFolder = exports.isBaseEnv = void 0;
+exports.execute = exports.makeSpec = exports.cacheFolder = exports.isBaseEnv = void 0;
 const os = __importStar(__webpack_require__(87));
 const path = __importStar(__webpack_require__(622));
 const constants = __importStar(__webpack_require__(58));
@@ -1604,6 +1604,18 @@ function cacheFolder() {
     return path.join(os.homedir(), constants.CONDA_CACHE_FOLDER);
 }
 exports.cacheFolder = cacheFolder;
+/**
+ * create a spec string. Generally favors '=' unless specified more tightly
+ */
+function makeSpec(pkg, spec) {
+    if (spec.match(/=<>!\|/)) {
+        return `${pkg}${spec}`;
+    }
+    else {
+        return `${pkg}=${spec}`;
+    }
+}
+exports.makeSpec = makeSpec;
 /**
  * Run exec.exec with error handling
  */

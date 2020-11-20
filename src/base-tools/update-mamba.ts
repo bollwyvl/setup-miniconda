@@ -2,8 +2,10 @@ import * as fs from "fs";
 
 import * as core from "@actions/core";
 
-import * as types from "../_types";
 import * as constants from "../_constants";
+import * as types from "../_types";
+import * as utils from "../_utils";
+
 import * as conda from "../conda";
 
 export const updateMamba: types.IToolProvider = {
@@ -14,7 +16,7 @@ export const updateMamba: types.IToolProvider = {
       `Mamba support is still experimental and can result in differently solved environments!`
     );
     return {
-      tools: [`mamba ${inputs.mambaVersion}`],
+      tools: [utils.makeSpec("mamba", inputs.mambaVersion)],
       options,
     };
   },

@@ -11,7 +11,7 @@ export const updatePython: types.IToolProvider = {
       options,
     };
 
-    updates.tools.push(`python ${inputs.pythonVersion}`);
+    updates.tools.push(utils.makeSpec("python", inputs.pythonVersion));
 
     return updates;
   },
