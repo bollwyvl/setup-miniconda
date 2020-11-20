@@ -1,7 +1,7 @@
 import * as types from "../_types";
 
 export const ensureExplicit: types.IEnvProvider = {
-  label: "Explicit Specification",
+  label: "create (explicit)",
   provides: async (inputs, options) => !!options.envSpec?.explicit?.length,
   condaArgs: async (inputs, options) => {
     if (inputs.pythonVersion) {

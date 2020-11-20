@@ -1151,7 +1151,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ensureSimple = void 0;
 const core = __importStar(__webpack_require__(470));
 exports.ensureSimple = {
-    label: "Simple Environment",
+    label: "create (simple)",
     provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         var _a, _b, _c;
         core.info(JSON.stringify(options));
@@ -13903,7 +13903,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ensureExplicit = void 0;
 exports.ensureExplicit = {
-    label: "Explicit Specification",
+    label: "create (explicit)",
     provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () { var _a, _b; return !!((_b = (_a = options.envSpec) === null || _a === void 0 ? void 0 : _a.explicit) === null || _b === void 0 ? void 0 : _b.length); }),
     condaArgs: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         if (inputs.pythonVersion) {
@@ -18470,7 +18470,7 @@ const providers = [
     },
 ];
 exports.ensureYaml = {
-    label: "YAML",
+    label: "env update",
     provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () { var _a; return !!Object.keys(((_a = options.envSpec) === null || _a === void 0 ? void 0 : _a.yaml) || {}).length; }),
     condaArgs: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         var _b;
@@ -19935,7 +19935,7 @@ function getLocalInstallerPath(inputs, options) {
                 return yield core.group(`Download installer with ${provider.label}...`, () => provider.installerPath(inputs, options));
             }
         }
-        throw Error(`No installer could be found for the given inputs, tried: ${Array.from(providers.map((p) => `\n- ${p.label}`)).join("\n")}`);
+        throw Error(`No installer could be found for the given inputs, tried: ${Array.from(providers.map((p) => `\n- ${p.label}`)).join("")}`);
     });
 }
 exports.getLocalInstallerPath = getLocalInstallerPath;
@@ -34785,8 +34785,8 @@ const yaml_1 = __webpack_require__(528);
 const simple_1 = __webpack_require__(21);
 const providers = [
     explicit_1.ensureExplicit,
-    yaml_1.ensureYaml,
     simple_1.ensureSimple,
+    yaml_1.ensureYaml,
 ];
 /**
  * Create test environment, or update the base environment
@@ -34794,13 +34794,17 @@ const providers = [
 function ensureEnvironment(inputs, options) {
     return __awaiter(this, void 0, void 0, function* () {
         for (const provider of providers) {
+            core.info(`Trying ${provider.label}...`);
             if (yield provider.provides(inputs, options)) {
+                core.info(`... will create with ${provider.label}`);
                 const args = yield provider.condaArgs(inputs, options);
                 return yield core.group(`Updating env from ${provider.label}...`, () => conda.condaCommand(args, options));
             }
             break;
         }
-        throw Error(`Environment ${inputs.activateEnvironment} could not be updated with the provided action inputs`);
+        throw Error(`'activate-environment: ${inputs.activateEnvironment}' could not be created with any of ${providers
+            .map((x) => `- ${x.label}`)
+            .join("")}`);
     });
 }
 exports.ensureEnvironment = ensureEnvironment;

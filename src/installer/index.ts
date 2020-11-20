@@ -34,7 +34,7 @@ export async function getLocalInstallerPath(
   throw Error(
     `No installer could be found for the given inputs, tried: ${Array.from(
       providers.map((p) => `\n- ${p.label}`)
-    ).join("\n")}`
+    ).join("")}`
   );
 }
 

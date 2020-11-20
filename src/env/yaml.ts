@@ -28,7 +28,7 @@ const providers: IEnvPatchProvider[] = [
   },
 ];
 export const ensureYaml: types.IEnvProvider = {
-  label: "YAML",
+  label: "env update",
   provides: async (inputs, options) =>
     !!Object.keys(options.envSpec?.yaml || {}).length,
   condaArgs: async (inputs, options) => {

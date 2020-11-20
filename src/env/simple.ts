@@ -3,7 +3,7 @@ import * as types from "../_types";
 import * as core from "@actions/core";
 
 export const ensureSimple: types.IEnvProvider = {
-  label: "Simple Environment",
+  label: "create (simple)",
   provides: async (inputs, options) => {
     core.info(JSON.stringify(options));
     return !(

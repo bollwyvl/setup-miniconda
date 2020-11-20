@@ -14,8 +14,8 @@ import { ensureSimple } from "./simple";
 
 const providers: types.IEnvProvider[] = [
   ensureExplicit,
-  ensureYaml,
   ensureSimple,
+  ensureYaml,
 ];
 
 /**
@@ -26,7 +26,9 @@ export async function ensureEnvironment(
   options: types.IDynamicOptions
 ): Promise<void> {
   for (const provider of providers) {
+    core.info(`Trying ${provider.label}...`);
     if (await provider.provides(inputs, options)) {
+      core.info(`... will create with ${provider.label}`);
       const args = await provider.condaArgs(inputs, options);
       return await core.group(`Updating env from ${provider.label}...`, () =>
         conda.condaCommand(args, options)
@@ -36,7 +38,11 @@ export async function ensureEnvironment(
   }
 
   throw Error(
-    `Environment ${inputs.activateEnvironment} could not be updated with the provided action inputs`
+    `'activate-environment: ${
+      inputs.activateEnvironment
+    }' could not be created with any of ${providers
+      .map((x) => `- ${x.label}`)
+      .join("")}`
   );
 }
 
