@@ -3,7 +3,11 @@ import * as types from "../_types";
 export const bundledMinicondaUser: types.IInstallerProvider = {
   label: "Bundled Miniconda",
   provides: async (inputs, options) => {
-    return inputs.minicondaVersion === "" && inputs.architecture === "x64";
+    return (
+      inputs.minicondaVersion === "" &&
+      inputs.architecture === "x64" &&
+      inputs.installerUrl === ""
+    );
   },
   installerPath: async (inputs, options) => {
     return {

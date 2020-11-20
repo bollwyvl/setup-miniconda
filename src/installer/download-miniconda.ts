@@ -72,7 +72,11 @@ async function downloadMiniconda(inputs: types.IActionInputs) {
 export const minicondaDownloader: types.IInstallerProvider = {
   label: "Download Miniconda",
   provides: async (inputs, options) => {
-    return inputs.minicondaVersion !== "" && inputs.architecture !== "x64";
+    return (
+      inputs.minicondaVersion !== "" &&
+      inputs.architecture !== "x64" &&
+      inputs.installerUrl === ""
+    );
   },
   installerPath: async (inputs, options) => {
     return {
