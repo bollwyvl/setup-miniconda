@@ -87,6 +87,9 @@ export async function parseInputs(): Promise<types.IActionInputs> {
     return errors;
   }, [] as string[]);
 
+  // TODO: remove
+  core.info(JSON.stringify(inputs));
+
   if (errors.length) {
     throw Error(`${errors.length} errors found in action inputs`);
   }
