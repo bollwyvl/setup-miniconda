@@ -12898,7 +12898,6 @@ function fixPermissions(options) {
                 for (let folder of constants.WIN_PERMS_FOLDERS) {
                     const ownPath = path.join(condaBasePath(options), folder);
                     if (fs.existsSync(ownPath)) {
-                        core.startGroup(`Fixing ${folder} ownership`);
                         yield utils.execute(["takeown", "/f", ownPath, "/r", "/d", "y"]);
                     }
                 }
@@ -12931,7 +12930,7 @@ function applyCondaConfiguration(inputs, options) {
         }
         // all other options
         for (const [key, value] of configEntries) {
-            if (value.trim().length === 0) {
+            if (value.trim().length === 0 || key === "channels") {
                 continue;
             }
             core.info(`${key}: ${value}`);
@@ -18412,11 +18411,11 @@ function setupMiniconda(inputs) {
             useMamba: false,
         };
         yield core.group(`Creating bootstrap .condarc file in ${constants.CONDARC_PATH}...`, conda.bootstrapConfig);
-        const installerInfo = yield installer.getLocalInstallerPath(inputs, options);
+        const installerInfo = yield core.group("Ensuring installer...", () => installer.getLocalInstallerPath(inputs, options));
         options = Object.assign(Object.assign({}, options), installerInfo.options);
         const basePath = conda.condaBasePath(options);
         if (installerInfo.localInstallerPath && !options.useBundled) {
-            yield installer.runInstaller(installerInfo.localInstallerPath, basePath);
+            yield core.group("Running installer...", () => installer.runInstaller(installerInfo.localInstallerPath, basePath));
         }
         if (!fs.existsSync(basePath)) {
             throw Error(`No installed conda 'base' enviroment found at ${basePath}`);
@@ -18429,7 +18428,7 @@ function setupMiniconda(inputs) {
         options.envSpec = yield core.group("Parsing environment...", () => env.getEnvSpec(inputs));
         yield core.group("Configuring conda package cache...", () => outputs.setCacheVariable(options));
         yield core.group("Applying initial configuration...", () => conda.applyCondaConfiguration(inputs, options));
-        yield core.group("Initializing conda...", () => conda.condaInit(inputs, options));
+        yield core.group("Initializing conda shell integration...", () => conda.condaInit(inputs, options));
         const toolOptions = yield core.group("Adding tools to 'base' env", () => baseTools.installBaseTools(inputs, options));
         // `useMamba` may have changed
         options = Object.assign(Object.assign({}, options), toolOptions);
@@ -33126,7 +33125,6 @@ const core = __importStar(__webpack_require__(470));
  */
 function ensureLocalInstaller(options) {
     return __awaiter(this, void 0, void 0, function* () {
-        core.startGroup("Ensuring Installer...");
         const url = new url_1.URL(options.url);
         const installerName = path.basename(url.pathname);
         // as a URL, we assume posix paths
@@ -33160,7 +33158,6 @@ function ensureLocalInstaller(options) {
             const cacheResult = yield tc.cacheFile(executablePath, installerName, tool, version, ...(options.arch ? [options.arch] : []));
             core.info(`Cached ${tool}@${version}: ${cacheResult}!`);
         }
-        core.endGroup();
         if (executablePath === "") {
             throw Error("Could not determine an executable path from installer-url");
         }

@@ -27,12 +27,16 @@ async function setupMiniconda(inputs: types.IActionInputs): Promise<void> {
     conda.bootstrapConfig
   );
 
-  const installerInfo = await installer.getLocalInstallerPath(inputs, options);
+  const installerInfo = await core.group("Ensuring installer...", () =>
+    installer.getLocalInstallerPath(inputs, options)
+  );
   options = { ...options, ...installerInfo.options };
   const basePath = conda.condaBasePath(options);
 
   if (installerInfo.localInstallerPath && !options.useBundled) {
-    await installer.runInstaller(installerInfo.localInstallerPath, basePath);
+    await core.group("Running installer...", () =>
+      installer.runInstaller(installerInfo.localInstallerPath, basePath)
+    );
   }
 
   if (!fs.existsSync(basePath)) {
@@ -60,7 +64,7 @@ async function setupMiniconda(inputs: types.IActionInputs): Promise<void> {
     conda.applyCondaConfiguration(inputs, options)
   );
 
-  await core.group("Initializing conda...", () =>
+  await core.group("Initializing conda shell integration...", () =>
     conda.condaInit(inputs, options)
   );
 

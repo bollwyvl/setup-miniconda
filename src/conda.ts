@@ -201,7 +201,6 @@ async function fixPermissions(options: types.IDynamicOptions): Promise<void> {
       for (let folder of constants.WIN_PERMS_FOLDERS) {
         const ownPath = path.join(condaBasePath(options), folder);
         if (fs.existsSync(ownPath)) {
-          core.startGroup(`Fixing ${folder} ownership`);
           await utils.execute(["takeown", "/f", ownPath, "/r", "/d", "y"]);
         }
       }
@@ -242,7 +241,7 @@ export async function applyCondaConfiguration(
 
   // all other options
   for (const [key, value] of configEntries) {
-    if (value.trim().length === 0) {
+    if (value.trim().length === 0 || key === "channels") {
       continue;
     }
     core.info(`${key}: ${value}`);

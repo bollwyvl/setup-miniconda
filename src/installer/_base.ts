@@ -22,8 +22,6 @@ import * as types from "../_types";
 export async function ensureLocalInstaller(
   options: types.ILocalInstallerOpts
 ): Promise<string> {
-  core.startGroup("Ensuring Installer...");
-
   const url = new URL(options.url);
 
   const installerName = path.basename(url.pathname);
@@ -69,8 +67,6 @@ export async function ensureLocalInstaller(
     );
     core.info(`Cached ${tool}@${version}: ${cacheResult}!`);
   }
-
-  core.endGroup();
 
   if (executablePath === "") {
     throw Error("Could not determine an executable path from installer-url");
