@@ -23,13 +23,17 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu", "macos", "windows"]
+        include:
+          - os: windows
+            miniforge-version: 4.9.2-4
     steps:
       - uses: actions/checkout@v2
       - uses: ./
         id: setup-miniconda
         with:
-          miniforge-variant: Miniforge3
           environment-file: etc/example-environment.yml
+          miniforge-variant: Miniforge3
+          miniforge-version: ${{ matrix.miniforge-version }}
       - run: |
           conda info
           conda list
@@ -46,14 +50,28 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu", "macos", "windows"]
+        include:
+          - os: ubuntu
+            environment-file: etc/example-environment-no-name.yml
+            miniforge-variant: Mambaforge
+            miniforge-version: 4.9.2-4
+          - os: macos
+            environment-file: etc/example-empty-channels-environment.yml
+            miniforge-variant: Mambaforge-pypy3
+          - os: windows
+            environment-file: etc/example-explicit.Windows.conda.lock
+            condarc-file: etc/example-condarc.yml
+            miniforge-variant: Mambaforge
     steps:
       - uses: actions/checkout@v2
       - uses: ./
         id: setup-miniconda
         with:
-          miniforge-variant: Mambaforge
+          condarc-file: ${{ matrix.condarc-file }}
+          environment-file: ${{ matrix.environment-file }}
+          miniforge-variant: ${{ matrix.miniforge-variant }}
+          miniforge-version: ${{ matrix.miniforge-version }}
           use-mamba: true
-          environment-file: etc/example-environment.yml
       - run: |
           mamba info
           mamba list
