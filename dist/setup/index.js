@@ -34142,32 +34142,25 @@ const base = __importStar(__webpack_require__(122));
  */
 function miniforgeVersions(variant, osName, arch) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            let extension = constants.IS_UNIX ? "sh" : "exe";
-            core.info(`Downloading ${constants.MINIFORGE_INDEX_URL}`);
-            const downloadPath = yield tc.downloadTool(constants.MINIFORGE_INDEX_URL);
-            const data = JSON.parse(fs.readFileSync(downloadPath, "utf8"));
-            core.info(JSON.stringify(data));
-            const assets = [];
-            const suffix = `${osName}-${arch}.${extension}`;
-            for (const release of data) {
-                if (release.prerelease || release.draft) {
-                    core.info(`Discarding prerelease/draft ${release.tag_name}`);
-                    continue;
-                }
-                for (const asset of release.assets) {
-                    core.info(`Considering ${asset.name}...`);
-                    if (asset.name.match(`^${variant}-\d`) && asset.name.endsWith(suffix)) {
-                        assets.push(Object.assign(Object.assign({}, asset), { tag_name: release.tag_name }));
-                    }
+        const assets = [];
+        let extension = constants.IS_UNIX ? "sh" : "exe";
+        const suffix = `${osName}-${arch}.${extension}`;
+        core.info(`Downloading ${constants.MINIFORGE_INDEX_URL}`);
+        const downloadPath = yield tc.downloadTool(constants.MINIFORGE_INDEX_URL);
+        const data = JSON.parse(fs.readFileSync(downloadPath, "utf8"));
+        for (const release of data) {
+            if (release.prerelease || release.draft) {
+                core.info(`Discarding prerelease/draft ${release.tag_name}...`);
+                continue;
+            }
+            for (const asset of release.assets) {
+                core.info(`Considering ${asset.name}...`);
+                if (asset.name.endsWith(suffix)) {
+                    assets.push(Object.assign(Object.assign({}, asset), { tag_name: release.tag_name }));
                 }
             }
-            return assets;
         }
-        catch (err) {
-            core.warning(err);
-            return [];
-        }
+        return assets;
     });
 }
 /**
