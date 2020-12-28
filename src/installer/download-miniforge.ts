@@ -20,6 +20,7 @@ async function miniforgeVersions(
 ): Promise<types.IGithubAssetWithRelease[]> {
   try {
     let extension: string = constants.IS_UNIX ? "sh" : "exe";
+    core.info(`Downloading ${constants.MINIFORGE_INDEX_URL}`);
     const downloadPath: string = await tc.downloadTool(
       constants.MINIFORGE_INDEX_URL
     );
@@ -28,17 +29,21 @@ async function miniforgeVersions(
       fs.readFileSync(downloadPath, "utf8")
     );
 
+    core.info(JSON.stringify(data));
+
     const assets: types.IGithubAssetWithRelease[] = [];
+
+    const suffix = `${osName}-${arch}.${extension}`;
 
     for (const release of data) {
       if (release.prerelease || release.draft) {
+        core.info(`Discarding prerelease/draft ${release.tag_name}`);
         continue;
       }
       for (const asset of release.assets) {
-        if (
-          asset.name.match(`^${variant}-\d`) &&
-          asset.name.endsWith(`${osName}-${arch}.${extension}`)
-        ) {
+        core.info(`Considering ${asset.name}...`);
+
+        if (asset.name.match(`^${variant}-\d`) && asset.name.endsWith(suffix)) {
           assets.push({ ...asset, tag_name: release.tag_name });
         }
       }
