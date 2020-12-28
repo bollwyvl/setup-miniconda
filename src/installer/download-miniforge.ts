@@ -39,9 +39,17 @@ async function miniforgeVersions(
     for (const asset of release.assets) {
       core.info(`Considering ${asset.name}...`);
 
-      if (asset.name.endsWith(suffix)) {
-        assets.push({ ...asset, tag_name: release.tag_name });
+      if (!asset.name.match(`${variant}-\\d`)) {
+        core.info("... discarding, wrong variant");
+        continue;
       }
+
+      if (!asset.name.endsWith(suffix)) {
+        core.info("... discarding, wrong platform");
+        continue;
+      }
+
+      assets.push({ ...asset, tag_name: release.tag_name });
     }
   }
 

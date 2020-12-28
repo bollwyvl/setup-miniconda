@@ -34155,9 +34155,15 @@ function miniforgeVersions(variant, osName, arch) {
             }
             for (const asset of release.assets) {
                 core.info(`Considering ${asset.name}...`);
-                if (asset.name.endsWith(suffix)) {
-                    assets.push(Object.assign(Object.assign({}, asset), { tag_name: release.tag_name }));
+                if (!asset.name.match(`${variant}-\\d`)) {
+                    core.info("... discarding, wrong variant");
+                    continue;
                 }
+                if (!asset.name.endsWith(suffix)) {
+                    core.info("... discarding, wrong platform");
+                    continue;
+                }
+                assets.push(Object.assign(Object.assign({}, asset), { tag_name: release.tag_name }));
             }
         }
         return assets;
