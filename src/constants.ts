@@ -43,6 +43,17 @@ export const BASE_ENV_NAMES = ["root", "base", ""];
  */
 export const KNOWN_EXTENSIONS = [".exe", ".sh"];
 
+/** As of mamba 0.7.6, only these top-level commands are supported */
+export const MAMBA_SUBCOMMANDS = [
+  "install",
+  "create",
+  "list",
+  "search",
+  "run",
+  "info",
+  "clean",
+];
+
 /**
  * Errors that are always probably spurious
  */

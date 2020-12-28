@@ -9387,7 +9387,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PYTHON_SPEC = exports.WIN_PERMS_FOLDERS = exports.PROFILES = exports.ENV_VAR_CONDA_PKGS = exports.CONDA_CACHE_FOLDER = exports.CONDARC_PATH = exports.BOOTSTRAP_CONDARC = exports.FORCED_ERRORS = exports.IGNORED_WARNINGS = exports.KNOWN_EXTENSIONS = exports.BASE_ENV_NAMES = exports.MINIFORGE_URL_PREFIX = exports.MINIFORGE_INDEX_URL = exports.OS_NAMES = exports.ARCHITECTURES = exports.MINICONDA_BASE_URL = exports.IS_UNIX = exports.IS_LINUX = exports.IS_MAC = exports.IS_WINDOWS = exports.MINICONDA_DIR_PATH = void 0;
+exports.PYTHON_SPEC = exports.WIN_PERMS_FOLDERS = exports.PROFILES = exports.ENV_VAR_CONDA_PKGS = exports.CONDA_CACHE_FOLDER = exports.CONDARC_PATH = exports.BOOTSTRAP_CONDARC = exports.FORCED_ERRORS = exports.IGNORED_WARNINGS = exports.MAMBA_SUBCOMMANDS = exports.KNOWN_EXTENSIONS = exports.BASE_ENV_NAMES = exports.MINIFORGE_URL_PREFIX = exports.MINIFORGE_INDEX_URL = exports.OS_NAMES = exports.ARCHITECTURES = exports.MINICONDA_BASE_URL = exports.IS_UNIX = exports.IS_LINUX = exports.IS_MAC = exports.IS_WINDOWS = exports.MINICONDA_DIR_PATH = void 0;
 const os = __importStar(__webpack_require__(87));
 const path = __importStar(__webpack_require__(622));
 //-----------------------------------------------------------------------
@@ -9420,6 +9420,16 @@ exports.BASE_ENV_NAMES = ["root", "base", ""];
  * Known extensions for `constructor`-generated installers supported
  */
 exports.KNOWN_EXTENSIONS = [".exe", ".sh"];
+/** As of mamba 0.7.6, only these top-level commands are supported */
+exports.MAMBA_SUBCOMMANDS = [
+    "install",
+    "create",
+    "list",
+    "search",
+    "run",
+    "info",
+    "clean",
+];
 /**
  * Errors that are always probably spurious
  */
@@ -13060,11 +13070,14 @@ exports.condaBasePath = condaBasePath;
 /**
  * Provide cross platform location of conda/mamba executable
  */
-function condaExecutable(options) {
+function condaExecutable(options, subcommand) {
     const dir = condaBasePath(options);
     let condaExe;
-    let commandName;
-    commandName = options.useMamba ? "mamba" : "conda";
+    let commandName = "conda";
+    if (options.useMamba &&
+        (subcommand == null || constants.MAMBA_SUBCOMMANDS.includes(subcommand))) {
+        commandName = "mamba";
+    }
     commandName = constants.IS_WINDOWS ? commandName + ".bat" : commandName;
     condaExe = path.join(dir, "condabin", commandName);
     return condaExe;
@@ -13075,7 +13088,7 @@ exports.condaExecutable = condaExecutable;
  */
 function condaCommand(cmd, options) {
     return __awaiter(this, void 0, void 0, function* () {
-        const command = [condaExecutable(options), ...cmd];
+        const command = [condaExecutable(options, cmd[0]), ...cmd];
         return yield utils.execute(command);
     });
 }
