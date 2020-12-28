@@ -42,6 +42,9 @@ async function setupMiniconda(inputs: types.IActionInputs): Promise<void> {
     );
   }
 
+  // The installer may have provisioned mamba: use if requested
+  options.useMamba = options.mambaInInstaller && inputs.useMamba === "true";
+
   if (!fs.existsSync(basePath)) {
     throw Error(`No installed conda 'base' enviroment found at ${basePath}`);
   }

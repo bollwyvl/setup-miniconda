@@ -86,6 +86,7 @@ export interface IActionInputs {
   readonly miniforgeVersion: string;
   readonly pythonVersion: string;
   readonly removeProfiles: string;
+  readonly useMamba: string;
 }
 
 /**
