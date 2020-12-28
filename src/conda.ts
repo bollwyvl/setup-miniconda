@@ -177,9 +177,11 @@ export async function condaInit(
 
   // Run conda init
   for (let cmd of ["--all"]) {
-    // TODO: determine when it's safe to use mamba
     await utils.execute([
-      condaExecutable({ ...options, useMamba: false }),
+      condaExecutable({
+        ...options,
+        useMamba: options.mambaInInstaller && options.useMamba,
+      }),
       "init",
       cmd,
     ]);

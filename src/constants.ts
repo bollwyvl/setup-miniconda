@@ -11,6 +11,7 @@ export const IS_WINDOWS: boolean = process.platform === "win32";
 export const IS_MAC: boolean = process.platform === "darwin";
 export const IS_LINUX: boolean = process.platform === "linux";
 export const IS_UNIX: boolean = IS_MAC || IS_LINUX;
+
 export const MINICONDA_BASE_URL: string =
   "https://repo.anaconda.com/miniconda/";
 
@@ -26,6 +27,12 @@ export const OS_NAMES: types.IOperatingSystems = {
   darwin: "MacOSX",
   linux: "Linux",
 };
+
+export const MINIFORGE_BASE_URL = "https://github.com";
+
+export const MINIFORGE_INDEX_URL = `${MINIFORGE_BASE_URL}/conda-forge/miniforge/releases`;
+
+export const MINIFORGE_HREF_PREFIX = "/conda-forge/miniforge/releases/download";
 
 /** Names for a conda `base` env */
 export const BASE_ENV_NAMES = ["root", "base", ""];

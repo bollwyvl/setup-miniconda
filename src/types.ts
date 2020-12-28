@@ -79,8 +79,11 @@ export interface IActionInputs {
   readonly condaVersion: string;
   readonly environmentFile: string;
   readonly installerUrl: string;
+  readonly mambaInInstaller: string;
   readonly mambaVersion: string;
   readonly minicondaVersion: string;
+  readonly miniforgeVariant: string;
+  readonly miniforgeVersion: string;
   readonly pythonVersion: string;
   readonly removeProfiles: string;
 }
@@ -91,6 +94,7 @@ export interface IActionInputs {
 export interface IDynamicOptions {
   useBundled: boolean;
   useMamba: boolean;
+  mambaInInstaller: boolean;
   envSpec?: IEnvSpec;
   condaConfig: TCondaConfig;
 }
