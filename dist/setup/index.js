@@ -19154,6 +19154,7 @@ exports.bundledMinicondaUser = {
     label: "use bundled Miniconda",
     provides: (inputs, options) => __awaiter(void 0, void 0, void 0, function* () {
         return (inputs.minicondaVersion === "" &&
+            inputs.miniforgeVariant === "" &&
             inputs.architecture === "x64" &&
             inputs.installerUrl === "");
     }),
