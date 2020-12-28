@@ -9387,7 +9387,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PYTHON_SPEC = exports.WIN_PERMS_FOLDERS = exports.PROFILES = exports.ENV_VAR_CONDA_PKGS = exports.CONDA_CACHE_FOLDER = exports.CONDARC_PATH = exports.BOOTSTRAP_CONDARC = exports.FORCED_ERRORS = exports.IGNORED_WARNINGS = exports.KNOWN_EXTENSIONS = exports.BASE_ENV_NAMES = exports.MINIFORGE_HREF_PREFIX = exports.MINIFORGE_INDEX_URL = exports.MINIFORGE_BASE_URL = exports.OS_NAMES = exports.ARCHITECTURES = exports.MINICONDA_BASE_URL = exports.IS_UNIX = exports.IS_LINUX = exports.IS_MAC = exports.IS_WINDOWS = exports.MINICONDA_DIR_PATH = void 0;
+exports.PYTHON_SPEC = exports.WIN_PERMS_FOLDERS = exports.PROFILES = exports.ENV_VAR_CONDA_PKGS = exports.CONDA_CACHE_FOLDER = exports.CONDARC_PATH = exports.BOOTSTRAP_CONDARC = exports.FORCED_ERRORS = exports.IGNORED_WARNINGS = exports.KNOWN_EXTENSIONS = exports.BASE_ENV_NAMES = exports.MINIFORGE_URL_PREFIX = exports.MINIFORGE_INDEX_URL = exports.OS_NAMES = exports.ARCHITECTURES = exports.MINICONDA_BASE_URL = exports.IS_UNIX = exports.IS_LINUX = exports.IS_MAC = exports.IS_WINDOWS = exports.MINICONDA_DIR_PATH = void 0;
 const os = __importStar(__webpack_require__(87));
 const path = __importStar(__webpack_require__(622));
 //-----------------------------------------------------------------------
@@ -9410,9 +9410,10 @@ exports.OS_NAMES = {
     darwin: "MacOSX",
     linux: "Linux",
 };
-exports.MINIFORGE_BASE_URL = "https://github.com";
-exports.MINIFORGE_INDEX_URL = `${exports.MINIFORGE_BASE_URL}/conda-forge/miniforge/releases`;
-exports.MINIFORGE_HREF_PREFIX = "/conda-forge/miniforge/releases/download";
+/** API endpoint for Miniforge releases */
+exports.MINIFORGE_INDEX_URL = `https://api.github.com/repos/conda-forge/miniforge/releases`;
+/** Common download prefix */
+exports.MINIFORGE_URL_PREFIX = "https://github.com/conda-forge/miniforge/releases/download";
 /** Names for a conda `base` env */
 exports.BASE_ENV_NAMES = ["root", "base", ""];
 /**
@@ -34127,15 +34128,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.miniforgeDownloader = exports.downloadMiniforge = void 0;
 const fs = __importStar(__webpack_require__(747));
 const core = __importStar(__webpack_require__(470));
 const tc = __importStar(__webpack_require__(533));
-const get_hrefs_1 = __importDefault(__webpack_require__(222));
 const constants = __importStar(__webpack_require__(211));
 const base = __importStar(__webpack_require__(122));
 /**
@@ -34147,16 +34144,21 @@ function miniforgeVersions(variant, osName, arch) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let extension = constants.IS_UNIX ? "sh" : "exe";
-            const downloadPath = yield tc.downloadTool(constants.MINIFORGE_BASE_URL);
-            const content = fs.readFileSync(downloadPath, "utf8");
-            let hrefs = get_hrefs_1.default(content).filter((item) => 
-            // Only grab real downloads
-            item.startsWith(constants.MINIFORGE_HREF_PREFIX) &&
-                // Ensure the correct variant
-                item.match(`/${variant}-\d`) &&
-                // Ensure the os, architecture and extension
-                item.endsWith(`${osName}-${arch}.${extension}`));
-            return hrefs;
+            const downloadPath = yield tc.downloadTool(constants.MINIFORGE_INDEX_URL);
+            const data = JSON.parse(fs.readFileSync(downloadPath, "utf8"));
+            const assets = [];
+            for (const release of data) {
+                if (release.prerelease || release.draft) {
+                    continue;
+                }
+                for (const asset of release.assets) {
+                    if (asset.name.match(`^${variant}-\d`) &&
+                        asset.name.endsWith(`${osName}-${arch}.${extension}`)) {
+                        assets.push(Object.assign(Object.assign({}, asset), { tag_name: release.tag_name }));
+                    }
+                }
+            }
+            return assets;
         }
         catch (err) {
             core.warning(err);
@@ -34169,42 +34171,29 @@ function miniforgeVersions(variant, osName, arch) {
  */
 function downloadMiniforge(inputs, options) {
     return __awaiter(this, void 0, void 0, function* () {
-        // Check valid arch
+        let tool = inputs.miniforgeVariant.trim();
+        let version = inputs.miniforgeVersion.trim();
         const arch = constants.ARCHITECTURES[inputs.architecture];
+        // Check valid arch
         if (!arch) {
             throw new Error(`Invalid 'architecture: ${inputs.architecture}'`);
         }
+        let url;
         const extension = constants.IS_UNIX ? "sh" : "exe";
         const osName = constants.OS_NAMES[process.platform];
-        const inputVersion = inputs.miniforgeVersion.trim();
-        let installerPath;
-        if (inputVersion) {
-            const installerName = [
-                inputs.miniforgeVariant,
-                inputs.miniforgeVersion,
-                osName,
-                `${arch}.${extension}`,
-            ].join("-");
-            installerPath = [
-                constants.MINIFORGE_HREF_PREFIX,
-                inputs.miniforgeVersion,
-                installerName,
-            ].join("/");
+        if (version) {
+            const fileName = [tool, version, osName, `${arch}.${extension}`].join("-");
+            url = [constants.MINIFORGE_URL_PREFIX, version, fileName].join("/");
         }
         else {
-            const versions = yield miniforgeVersions(inputs.miniforgeVariant, osName, arch);
-            if (!versions.length) {
+            const assets = yield miniforgeVersions(inputs.miniforgeVariant, osName, arch);
+            if (!assets.length) {
                 throw new Error(`Couldn't fetch Miniforge versions and 'miniforge-version' not provided`);
             }
-            installerPath = versions[0];
+            version = assets[0].tag_name;
+            url = assets[0].browser_download_url;
         }
-        core.info(installerPath);
-        return yield base.ensureLocalInstaller({
-            url: `${constants.MINIFORGE_BASE_URL}${installerPath}`,
-            tool: inputs.miniforgeVariant,
-            version: inputs.miniforgeVersion,
-            arch,
-        });
+        return yield base.ensureLocalInstaller({ url, tool, version, arch });
     });
 }
 exports.downloadMiniforge = downloadMiniforge;

@@ -28,11 +28,12 @@ export const OS_NAMES: types.IOperatingSystems = {
   linux: "Linux",
 };
 
-export const MINIFORGE_BASE_URL = "https://github.com";
+/** API endpoint for Miniforge releases */
+export const MINIFORGE_INDEX_URL = `https://api.github.com/repos/conda-forge/miniforge/releases`;
 
-export const MINIFORGE_INDEX_URL = `${MINIFORGE_BASE_URL}/conda-forge/miniforge/releases`;
-
-export const MINIFORGE_HREF_PREFIX = "/conda-forge/miniforge/releases/download";
+/** Common download prefix */
+export const MINIFORGE_URL_PREFIX =
+  "https://github.com/conda-forge/miniforge/releases/download";
 
 /** Names for a conda `base` env */
 export const BASE_ENV_NAMES = ["root", "base", ""];

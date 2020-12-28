@@ -191,3 +191,23 @@ export interface IToolProvider {
     options: IDynamicOptions
   ) => Promise<void>;
 }
+
+/** A release asset from the GitHub API */
+export interface IGithubAsset {
+  browser_download_url: string;
+  created_at: string;
+  name: string;
+}
+
+/** An asset with some extra metadata from the release */
+export interface IGithubAssetWithRelease extends IGithubAsset {
+  tag_name: string;
+}
+
+/** The body of the API request */
+export interface IGithubRelease {
+  assets: IGithubAsset[];
+  tag_name: string;
+  prerelease: boolean;
+  draft: boolean;
+}
