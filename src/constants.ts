@@ -45,13 +45,14 @@ export const KNOWN_EXTENSIONS = [".exe", ".sh"];
 
 /** As of mamba 0.7.6, only these top-level commands are supported */
 export const MAMBA_SUBCOMMANDS = [
-  "install",
-  "create",
-  "list",
-  "search",
-  "run",
-  "info",
   "clean",
+  "create",
+  "env",
+  "info",
+  "install",
+  "list",
+  "run",
+  "search",
 ];
 
 /**

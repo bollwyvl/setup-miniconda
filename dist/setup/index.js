@@ -9386,13 +9386,14 @@ exports.BASE_ENV_NAMES = ["root", "base", ""];
 exports.KNOWN_EXTENSIONS = [".exe", ".sh"];
 /** As of mamba 0.7.6, only these top-level commands are supported */
 exports.MAMBA_SUBCOMMANDS = [
-    "install",
-    "create",
-    "list",
-    "search",
-    "run",
-    "info",
     "clean",
+    "create",
+    "env",
+    "info",
+    "install",
+    "list",
+    "run",
+    "search",
 ];
 /**
  * Errors that are always probably spurious
