@@ -20499,7 +20499,7 @@ function setupMiniconda(inputs) {
         yield core.group("Configuring conda package cache...", () => outputs.setCacheVariable(options));
         yield core.group("Applying initial configuration...", () => conda.applyCondaConfiguration(inputs, options));
         yield core.group("Initializing conda shell integration...", () => conda.condaInit(inputs, options));
-        const toolOptions = yield core.group("Adding tools to 'base' env", () => baseTools.installBaseTools(inputs, options));
+        const toolOptions = yield core.group("Adding tools to 'base' env...", () => baseTools.installBaseTools(inputs, options));
         // `useMamba` may have changed
         options = Object.assign(Object.assign({}, options), toolOptions);
         if (inputs.activateEnvironment) {
@@ -22097,9 +22097,9 @@ const INSTALLER_PROVIDERS = [
 function getLocalInstallerPath(inputs, options) {
     return __awaiter(this, void 0, void 0, function* () {
         for (const provider of INSTALLER_PROVIDERS) {
-            core.info(`Can we use ${provider.label}?`);
+            core.info(`Can we ${provider.label}?`);
             if (yield provider.provides(inputs, options)) {
-                core.info(`... will use ${provider.label}.`);
+                core.info(`... will ${provider.label}.`);
                 return provider.installerPath(inputs, options);
             }
         }
@@ -35388,9 +35388,9 @@ const ENV_PROVIDERS = [
 function ensureEnvironment(inputs, options) {
     return __awaiter(this, void 0, void 0, function* () {
         for (const provider of ENV_PROVIDERS) {
-            core.info(`Can we use ${provider.label}?`);
+            core.info(`Can we ${provider.label}?`);
             if (yield provider.provides(inputs, options)) {
-                core.info(`... will use ${provider.label}.`);
+                core.info(`... will ${provider.label}.`);
                 const args = yield provider.condaArgs(inputs, options);
                 return yield core.group(`Updating '${inputs.activateEnvironment}' env from ${provider.label}...`, () => conda.condaCommand(args, options));
             }

@@ -74,7 +74,7 @@ async function setupMiniconda(inputs: types.IActionInputs): Promise<void> {
     conda.condaInit(inputs, options)
   );
 
-  const toolOptions = await core.group("Adding tools to 'base' env", () =>
+  const toolOptions = await core.group("Adding tools to 'base' env...", () =>
     baseTools.installBaseTools(inputs, options)
   );
 
