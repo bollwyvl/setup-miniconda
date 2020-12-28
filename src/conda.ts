@@ -185,14 +185,7 @@ export async function condaInit(
 
   // Run conda init
   for (let cmd of ["--all"]) {
-    await utils.execute([
-      condaExecutable({
-        ...options,
-        useMamba: options.mambaInInstaller && options.useMamba,
-      }),
-      "init",
-      cmd,
-    ]);
+    await condaCommand(["init", cmd], options);
   }
 
   // Rename files

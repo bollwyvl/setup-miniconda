@@ -6628,15 +6628,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runInstaller = exports.ensureLocalInstaller = void 0;
+exports.ensureLocalInstaller = void 0;
 const crypto = __importStar(__webpack_require__(417));
 const path = __importStar(__webpack_require__(622));
 const url_1 = __webpack_require__(835);
 const core = __importStar(__webpack_require__(470));
 const io = __importStar(__webpack_require__(1));
 const tc = __importStar(__webpack_require__(533));
-const utils = __importStar(__webpack_require__(163));
-const conda = __importStar(__webpack_require__(259));
 /** Get the path for a locally-executable installer from cache, or as downloaded
  *
  * @returns the local path to the installer (with the correct extension)
@@ -6691,40 +6689,6 @@ function ensureLocalInstaller(options) {
     });
 }
 exports.ensureLocalInstaller = ensureLocalInstaller;
-/**
- * Create a conda base (ne root) env from a `constructor`-compatible CLI executable
- *
- * @param installerPath must have an appropriate extension for this platform
- */
-function runInstaller(installerPath, options) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const outputPath = conda.condaBasePath(options);
-        const installerExtension = path.extname(installerPath);
-        let command;
-        switch (installerExtension) {
-            case ".exe":
-                /* From https://docs.anaconda.com/anaconda/install/silent-mode/
-                    /D=<installation path> - Destination installation path.
-                                            - Must be the last argument.
-                                            - Do not wrap in quotation marks.
-                                            - Required if you use /S.
-                    For the above reasons, this is treated a monolithic arg
-                  */
-                command = [
-                    `"${installerPath}" /InstallationType=JustMe /RegisterPython=0 /S /D=${outputPath}`,
-                ];
-                break;
-            case ".sh":
-                command = ["bash", installerPath, "-f", "-b", "-p", outputPath];
-                break;
-            default:
-                throw new Error(`Unknown installer extension: ${installerExtension}`);
-        }
-        core.info(`Install Command:\n\t${command}`);
-        return yield utils.execute(command);
-    });
-}
-exports.runInstaller = runInstaller;
 
 
 /***/ }),
@@ -13204,11 +13168,7 @@ function condaInit(inputs, options) {
         }
         // Run conda init
         for (let cmd of ["--all"]) {
-            yield utils.execute([
-                condaExecutable(Object.assign(Object.assign({}, options), { useMamba: options.mambaInInstaller && options.useMamba })),
-                "init",
-                cmd,
-            ]);
+            yield condaCommand(["init", cmd], options);
         }
         // Rename files
         if (constants.IS_LINUX) {
