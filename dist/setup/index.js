@@ -18024,7 +18024,8 @@ function setPathVariables(options) {
         const condaBin = path.join(conda.condaBasePath(options), "condabin");
         const condaPath = conda.condaBasePath(options);
         core.info(`Add "${condaBin}" to PATH`);
-        core.addPath(condaBin);
+        // TODO: remove if it doesn't break anything...
+        // core.addPath(condaBin);
         if (!options.useBundled) {
             core.info(`Set 'CONDA="${condaPath}"'`);
             core.exportVariable("CONDA", condaPath);

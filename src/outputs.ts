@@ -19,7 +19,8 @@ export async function setPathVariables(
   const condaBin: string = path.join(conda.condaBasePath(options), "condabin");
   const condaPath: string = conda.condaBasePath(options);
   core.info(`Add "${condaBin}" to PATH`);
-  core.addPath(condaBin);
+  // TODO: remove if it doesn't break anything...
+  // core.addPath(condaBin);
   if (!options.useBundled) {
     core.info(`Set 'CONDA="${condaPath}"'`);
     core.exportVariable("CONDA", condaPath);
